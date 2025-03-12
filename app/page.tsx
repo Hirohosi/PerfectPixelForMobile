@@ -238,7 +238,7 @@ export default function Home() {
                     onValueChange={([value]) => setOpacity(value / 100)}
                     max={100}
                     step={1}
-                    className="w-full"
+                    className="w-full [&_.relative]:bg-gray-500 [&_[role=slider]]:bg-purple-500 [&_[role=slider]]:border-purple-400"
                   />
                   <span className="text-sm font-medium text-gray-400 w-16">
                     {Math.round(opacity * 100)}%
