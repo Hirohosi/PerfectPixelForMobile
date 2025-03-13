@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { Upload, MoveLeft, MoveRight, MoveUp, MoveDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -25,6 +25,26 @@ export default function Home() {
   const [isDragging, setIsDragging] = useState(false);
   const [dragStart, setDragStart] = useState<Position>({ x: 0, y: 0 });
   const overlayRef = useRef<HTMLDivElement>(null);
+  const [imageScale, setImageScale] = useState(1);
+  const figmaImageRef = useRef<HTMLImageElement>(null);
+  const screenshotRef = useRef<HTMLImageElement>(null);
+
+  useEffect(() => {
+    const figmaImg = figmaImageRef.current;
+    const screenshotImg = screenshotRef.current;
+
+    if (figmaImg && screenshotImg) {
+      const handleLoad = () => {
+        const figmaWidth = figmaImg.naturalWidth;
+        const screenshotWidth = screenshotImg.naturalWidth;
+        const scale = figmaWidth / screenshotWidth;
+        setImageScale(scale);
+      };
+
+      figmaImg.addEventListener("load", handleLoad);
+      return () => figmaImg.removeEventListener("load", handleLoad);
+    }
+  }, []);
 
   const handleDragOver = (e: React.DragEvent) => {
     e.preventDefault();
@@ -291,6 +311,7 @@ export default function Home() {
                 onMouseLeave={handleMouseUp}
               >
                 <Image
+                  ref={figmaImageRef}
                   src={images.figma}
                   alt="Figma design"
                   className="absolute inset-0 w-full h-full object-contain"
@@ -302,10 +323,11 @@ export default function Home() {
                   className="absolute inset-0 cursor-move"
                   onMouseDown={handleMouseDown}
                   style={{
-                    transform: `translate(${position.x}px, ${position.y}px)`,
+                    transform: `translate(${position.x}px, ${position.y}px) scale(${imageScale})`,
                   }}
                 >
                   <Image
+                    ref={screenshotRef}
                     src={images.screenshot}
                     alt="App screenshot"
                     className="w-full h-full object-contain"
